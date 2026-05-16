@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    container_name: pacome_apache
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+    volumes:
+      - ./html:/var/www/html
+    networks:
+      - pacome_network
+
+networks:
+  pacome_network:
+    driver: bridge

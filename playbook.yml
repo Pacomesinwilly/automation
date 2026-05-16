@@ -1,0 +1,48 @@
+---
+- name: Installation et configuration Apache
+  hosts: all
+  become: yes
+  vars:
+    apache_port: 80
+    site_name: "Portfolio Pacome SINWILLY"
+
+  tasks:
+    - name: Mise a jour des paquets
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Installation Apache2
+      apt:
+        name: apache2
+        state: present
+
+    - name: Demarrage et activation Apache
+      systemd:
+        name: apache2
+        state: started
+        enabled: yes
+
+    - name: Copie de la page index
+      copy:
+        content: |
+          <html>
+          <body style="background:#0A0A0A;color:#F97316;font-family:sans-serif;
+                       display:flex;align-items:center;justify-content:center;
+                       height:100vh;margin:0">
+            <div style="text-align:center">
+              <h1>{{ site_name }}</h1>
+              <p>Deploye avec Ansible</p>
+            </div>
+          </body>
+          </html>
+        dest: /var/www/html/index.html
+        mode: '0644'
+
+    - name: Verification Apache actif
+      command: systemctl is-active apache2
+      register: apache_status
+
+    - name: Affichage statut
+      debug:
+        msg: "Apache est {{ apache_status.stdout }}"
